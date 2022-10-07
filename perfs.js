@@ -106,6 +106,10 @@ const coinChange2 = (function () {
 
 // Fibonacci
 
+const fibPerf = "Fibonacci";
+
+performance.mark(fibPerf);
+
 const list = Array(10)
   .fill(0)
   .map((v, i) => i);
@@ -113,6 +117,13 @@ const list = Array(10)
 list.forEach((n) => {
   console.log(`fib(${n}) = ${fib(n)}`);
 });
+
+performance.measure(fibPerf, fibPerf);
+
+console.log(performance.getEntriesByType("measure"));
+
+performance.clearMarks();
+performance.clearMeasures();
 
 // Coins
 
