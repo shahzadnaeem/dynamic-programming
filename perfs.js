@@ -23,6 +23,8 @@ const fib = (function () {
   };
 })();
 
+// Coin change function - tried to be smart and keeping track of the coins not working correctly
+
 const coinChange = (function () {
   let MEMO = {};
 
@@ -39,17 +41,23 @@ const coinChange = (function () {
       return memo;
     }
 
-    if (target === 0) {
-      return { minCoins: 0, how };
-    } else if (target < 0) {
-      return { minCoins: Number.MAX_SAFE_INTEGER, how: ["X"] };
-    }
+    // if (target === 0) {
+    //   return { minCoins: 0, how };
+    // } else if (target < 0) {
+    //   return { minCoins: Number.MAX_SAFE_INTEGER, how: ["X"] };
+    // }
 
     const results = [];
 
     coins.forEach((coin) => {
-      const res = coinChange(coins, target - coin, [...how, coin]);
-      results.push(res);
+      if (target === coin) {
+        results.push({ minCoins: 0, how: [...how, coin] });
+      } else if (target < coin) {
+        results.push({ minCoins: Number.MAX_SAFE_INTEGER, how: ["X"] });
+      } else {
+        const res = coinChange(coins, target - coin, [...how, coin]);
+        results.push(res);
+      }
     });
 
     const smallest = results.reduce((smallest, curr) =>
@@ -61,7 +69,7 @@ const coinChange = (function () {
     const result = { minCoins, how: smallest.how };
 
     // TODO: This makes the output `how` correct, but not enough is being cached and run times are slow
-    // TODO: Always caching gives the wrong `has` - DOH!
+    // TODO: Always caching gives the wrong `how` - DOH!
     if (result.minCoins === result.how.length) {
       MEMO[key] = result;
       //   console.log(` >MEMO[${key}] = ${JSON.stringify(result)}`);
@@ -97,6 +105,66 @@ const coinChange2 = (function () {
     const minCoins = 1 + Math.min(...results);
 
     const result = minCoins;
+
+    MEMO[key] = result;
+
+    return result;
+  };
+})();
+
+// Knapsack
+
+const knapsack = (function () {
+  let MEMO = {};
+
+  return function knapsack(items, capacity, i = 0, contents = []) {
+    const key = `${capacity}.${i}`;
+
+    if (MEMO[key]) {
+      // console.log(`MEMO: ${JSON.stringify(contents)}`);
+      return MEMO[key];
+    }
+
+    // Do the work, memoize and return
+
+    // Termination cases
+    if (capacity === 0) {
+      // console.log(`FULL: ${JSON.stringify(contents)}`);
+      return 0;
+    } else if (capacity < 0) {
+      return Number.MIN_SAFE_INTEGER;
+    } else if (i === items.length) {
+      // console.log(`END: ${JSON.stringify(contents)}`);
+      return 0;
+    }
+
+    const result = Math.max(
+      knapsack(items, capacity, i + 1, contents), // Nothing added case
+      knapsack(items, capacity - items[i].weight, i + 1, [
+        ...contents,
+        items[i],
+      ]) + items[i].value
+    );
+
+    MEMO[key] = result;
+
+    return result;
+  };
+})();
+
+// Template
+
+const template = (function () {
+  let MEMO = {};
+
+  return function template(arg1, arg2, arg3) {
+    const key = `${arg1}.${arg2}`;
+
+    if (MEMO[key]) {
+      return MEMO[key];
+    }
+
+    // Do the work, memoize and return
 
     MEMO[key] = result;
 
@@ -162,3 +230,21 @@ console.log(performance.getEntriesByType("measure"));
 
 performance.clearMarks();
 performance.clearMeasures();
+
+// Knapsack
+
+const items = [
+  { weight: 10, value: 20 },
+  { weight: 4, value: 30 },
+  { weight: 20, value: 10 },
+  { weight: 40, value: 5 },
+  { weight: 1, value: 2 },
+];
+
+knapsacks = [20, 12, 14, 15, 30];
+
+knapsacks.forEach((capacity) => {
+  console.log(`knapsack: ${capacity} => ${knapsack(items, capacity, 0)}`);
+});
+
+const best = knapsack(items, 20, 0);
