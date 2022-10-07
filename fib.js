@@ -32,7 +32,7 @@ const coinChange = (function () {
     // console.log(`key=${key}, how=${JSON.stringify(how)}`);
 
     if (MEMO[key]) {
-      // NOTE: FFS! Not doing this took me all day to find!
+      // NOTE: FFS! Not doing this took me all day to find! DO NOT MODIFY a cached value!
       const memo = { ...MEMO[key] };
       //   console.log(` +MEMO[${key}] = ${JSON.stringify(memo)}, how=${how}`);
       memo.how = [...how, ...memo.how];
@@ -60,6 +60,8 @@ const coinChange = (function () {
 
     const result = { minCoins, how: smallest.how };
 
+    // TODO: This makes the output `how` correct, but not enough is being cached and run times are slow
+    // TODO: Always caching gives the wrong `has` - DOH!
     if (result.minCoins === result.how.length) {
       MEMO[key] = result;
       //   console.log(` >MEMO[${key}] = ${JSON.stringify(result)}`);
