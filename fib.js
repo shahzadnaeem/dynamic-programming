@@ -24,30 +24,32 @@ const fib = (function () {
 })();
 
 const coinChange = (function () {
-  const MEMO = {};
+  let MEMO = {};
 
   return function coinChange(coins, target, how = []) {
-    // console.log(`coinChange(${target}, ${how})`);
+    const key = coins.join(",") + `/${target}`;
 
-    // const key = coins.join(",") + target;
-    // if (MEMO[key]) {
-    //   return {
-    //     minCoins: MEMO[key].minCoins,
-    //     how: `${MEMO[key].how} + [${how}]`,
-    //   };
-    // }
+    // console.log(`key=${key}, how=${JSON.stringify(how)}`);
+
+    if (MEMO[key]) {
+      // NOTE: FFS! Not doing this took me all day to find!
+      const memo = { ...MEMO[key] };
+      //   console.log(` +MEMO[${key}] = ${JSON.stringify(memo)}, how=${how}`);
+      memo.how = [...how, ...memo.how];
+      return memo;
+    }
+
+    if (target === 0) {
+      return { minCoins: 0, how };
+    } else if (target < 0) {
+      return { minCoins: Number.MAX_SAFE_INTEGER, how: ["X"] };
+    }
 
     const results = [];
 
     coins.forEach((coin) => {
-      if (target === coin) {
-        results.push({ minCoins: 0, how: [...how, coin] });
-      } else if (target < coin) {
-        results.push({ minCoins: Number.MAX_SAFE_INTEGER, how: ["X"] });
-      } else {
-        const res = coinChange(coins, target - coin, [...how, coin]);
-        results.push(res);
-      }
+      const res = coinChange(coins, target - coin, [...how, coin]);
+      results.push(res);
     });
 
     const smallest = results.reduce((smallest, curr) =>
@@ -58,9 +60,43 @@ const coinChange = (function () {
 
     const result = { minCoins, how: smallest.how };
 
-    // MEMO[key] = result;
+    if (result.minCoins === result.how.length) {
+      MEMO[key] = result;
+      //   console.log(` >MEMO[${key}] = ${JSON.stringify(result)}`);
+    }
 
-    // console.log(`  coinChange(${target}, ${how}) = ${JSON.stringify(result)}`);
+    return result;
+  };
+})();
+
+const coinChange2 = (function () {
+  let MEMO = {};
+
+  return function coinChange(coins, target) {
+    const key = coins.join(",") + `/${target}`;
+
+    if (MEMO[key]) {
+      return MEMO[key];
+    }
+
+    if (target === 0) {
+      return 0;
+    } else if (target < 0) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+
+    const results = [];
+
+    coins.forEach((coin) => {
+      const res = coinChange(coins, target - coin);
+      results.push(res);
+    });
+
+    const minCoins = 1 + Math.min(...results);
+
+    const result = minCoins;
+
+    MEMO[key] = result;
 
     return result;
   };
@@ -78,9 +114,14 @@ list.forEach((n) => {
 
 // Coins
 
-const coins = [1, 2, 5]; //, 10, 25, 50];
+const coins = [1, 2, 5, 25, 50];
 
-const targets = [8, 1, 3, 7, 12, 25, 27, 29]; // 78, 300];
+const targets = [1, 8, 1, 3, 7, 12, 13, 25, 27, 29, 32, 36, 39];
+
+const perf1 = "Change-with-how";
+const perf2 = "Change-simple";
+
+performance.mark(perf1);
 
 targets.forEach((target) => {
   console.log(`Make ${target}:`);
@@ -88,3 +129,23 @@ targets.forEach((target) => {
     `Min coins to make ${target} = ${JSON.stringify(coinChange(coins, target))}`
   );
 });
+
+performance.measure(perf1, perf1);
+
+performance.mark(perf2);
+
+targets.forEach((target) => {
+  console.log(`Make ${target}:`);
+  console.log(
+    `Min coins to make ${target} = ${JSON.stringify(
+      coinChange2(coins, target)
+    )}`
+  );
+});
+
+performance.measure(perf2, perf2);
+
+console.log(performance.getEntriesByType("measure"));
+
+performance.clearMarks();
+performance.clearMeasures();
