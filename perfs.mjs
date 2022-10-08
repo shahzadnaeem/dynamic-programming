@@ -1,27 +1,6 @@
+import { fib } from "./modules/fib.mjs";
+
 // Create a fib function with its own MEMO
-
-const fib = (function () {
-  const MEMO = {};
-
-  return function fib(n) {
-    if (n === 0) {
-      return 0;
-    } else if (n === 1) {
-      return 1;
-    }
-
-    if (MEMO[n]) {
-      return MEMO[n];
-    }
-
-    const fib1 = fib(n - 1);
-    const fib2 = fib(n - 2);
-
-    MEMO[n] = fib1 + fib2;
-
-    return fib1 + fib2;
-  };
-})();
 
 // Coin change function - tried to be smart and keeping track of the coins not working correctly
 
@@ -241,7 +220,7 @@ const items = [
   { weight: 1, value: 2 },
 ];
 
-knapsacks = [20, 12, 14, 15, 30];
+const knapsacks = [20, 12, 14, 15, 30];
 
 knapsacks.forEach((capacity) => {
   console.log(`knapsack: ${capacity} => ${knapsack(items, capacity, 0)}`);

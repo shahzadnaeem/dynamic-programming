@@ -1,3 +1,6 @@
 
+PERFS=perfs.mjs
+
 run:
-	node perfs.js
+	node $(PERFS)
+
