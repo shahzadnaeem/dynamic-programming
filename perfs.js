@@ -241,7 +241,7 @@ const items = [
   { weight: 1, value: 2 },
 ];
 
-knapsacks = [20, 12, 14, 15, 30];
+const knapsacks = [20, 12, 14, 15, 30];
 
 knapsacks.forEach((capacity) => {
   console.log(`knapsack: ${capacity} => ${knapsack(items, capacity, 0)}`);
