@@ -8,6 +8,9 @@ export const coinChange = (function () {
   // up to the likely max target in increasing order. Otherwise the first one that is
   // above the target will result in a massive computational explosion :(
 
+  // NOTE: This could be smarted by simply keeping track of the highest number cached
+  //       and filling in the cache on demand :)
+
   return function coinChange(coins, target, how = []) {
     const key = coins.join(",") + `/${target}`;
 
@@ -57,7 +60,7 @@ export const coinChange = (function () {
   };
 })();
 
-// Simple minimum number of coins only version
+// Simple minimum number of coins only version - no cache priming required
 
 export const coinChange2 = (function () {
   let MEMO = {};
