@@ -1,7 +1,9 @@
 import { fib } from "./modules/fib.mjs";
 import { coinChange, coinChange2 } from "./modules/coinChange.mjs";
 import { knapsack } from "./modules/knapsack.mjs";
+import { stepWays } from "./modules/stepWays.mjs";
 
+// ----------------------------------------------------------------------------
 // Fibonacci
 
 function testFib(to = 10) {
@@ -25,6 +27,7 @@ function testFib(to = 10) {
   performance.clearMeasures();
 }
 
+// ----------------------------------------------------------------------------
 // Coins
 
 function logPerfDelta() {
@@ -135,6 +138,7 @@ function fullFastTestCoinChange(to) {
   fastTestCoinChangeFn(targets.reverse(), coinChange2, "run reverse");
 }
 
+// ----------------------------------------------------------------------------
 // Knapsack
 
 function testKnapsack() {
@@ -156,10 +160,49 @@ function testKnapsack() {
 }
 
 // ----------------------------------------------------------------------------
+// Knapsack
 
-testFib(20);
+function testStepWays(maxSteps = 2) {
+  const staircases = Array(14)
+    .fill(0)
+    .map((v, i) => i);
+
+  staircases.forEach((staircase) => {
+    const result = stepWays(staircase, maxSteps);
+
+    let message = `${maxSteps} Fibonacci check `;
+
+    if (staircase > maxSteps) {
+      // We can check the N Fibonacci sequence holds!
+      let check = 0;
+      for (let i = 0; i < maxSteps; i++) {
+        check += stepWays(staircase - (maxSteps - i), maxSteps);
+      }
+
+      if (check === result) {
+        message += "OK";
+      } else {
+        message += ` for ${staircase} steps FAILED! - expected = ${check}, got = ${result}`;
+      }
+    } else {
+      message += "SKIPPED";
+    }
+
+    console.log(
+      `stepWays(${staircase},${maxSteps}): ${staircase} => ${result} -- ${message}`
+    );
+  });
+}
+
+// ----------------------------------------------------------------------------
+
+// testFib(20);
 
 // fullTestCoinChange(1000);
-fullFastTestCoinChange(20);
+// fullFastTestCoinChange(20);
 
 // testKnapsack();
+
+testStepWays();
+testStepWays(3);
+testStepWays(4);
