@@ -25,7 +25,7 @@ export const coinChange = (function () {
     }
 
     if (target === 0) {
-      return { minCoins: 0, how: [] };
+      return { target, minCoins: 0, how: [] };
     }
 
     const results = [];
@@ -47,7 +47,7 @@ export const coinChange = (function () {
 
     const minCoins = 1 + smallest.minCoins;
 
-    const result = { minCoins, how: smallest.how };
+    const result = { target, minCoins, how: smallest.how };
 
     if (result.minCoins === result.how.length) {
       MEMO[key] = result;
